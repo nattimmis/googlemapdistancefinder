@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Google distance measurement</title>
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=vzNWLF1NMdESQrKs4DCpw5FgoA7ucqdAg5eRgtHKlwRFfzSr-INY3A0xwEJ-d9wG7xZkdvgzoAq3YDP3LdwnmoXBvJdTUzLQ4NADW0KVIDe79DYK9sb2Y2DPmgUTjaEKEPOXU8msrZhkn54aI0JSejR2Gks-EdZBsqX84i8c7hNvsrohdY24yB3WIBjqvHLqz5hEJva13dYAVvTbbjTs0QSMxijOXf7_vjLWrMWP-7VRSmlcSjApswzQCbbP7y4taqcD6ux7JLDO__IhFiXCcIUFzsrBoZ16VIEx0U1N6PuX6k_0hdG0kQfagZKQPjBoyrTNiUuVIjEWLSJ3lNOTsJ2YY9ZaO32tt9jat0AZ0abcVboXRaWKB20BO-5TuYWpo3nGQguvgGK0FguGcn0S5Q" charset="UTF-8"></script><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzMf8iYVE1u-RjDZ2sQx0IqyXEUIlM1TQ&v=3.exp"></script>
+<script type="text/javascript">
+	var displayedarr=[];
+	var branchesarr= [["Galway",53.2858134,-8.9874202],
+	                  ["Dublin - Kylemore",53.3369405,-6.3438311],
+	                  ["Dublin - Sandyford",53.2786675,-6.2182429],
+	                  ["Limerick",52.6487137,-8.5855605],
+	                  ["Letterkenny",54.9517661,-7.7258668],
+	                  ["Ennis",52.8412491,-8.9664531],
+	                  ["Tullamore",53.2719996,-7.4733813],
+	                  ["Longford",53.5584242,-7.7646875],
+	                  ["Waterford",52.2463261,-7.1583899],
+	                  ["Athlone",53.4204341,-7.9915011],
+	                  ["Little Island",51.9058665,-8.347812],
+	                  ["Carlow",52.8401742,-6.9113037],
+	                  ["Kilkenny",52.6554275,-7.2316906],
+	                  ["Pouladuff",51.872546,-8.5075349],
+	                  ["Castlebar",53.8476247,-9.2820798],
+	                  ["Clonmel",52.3748495,-7.7206829],
+	                  ["Skibbereen",51.5601704,-9.26859],
+	                  ["Nenagh (Thurles)",52.8603916,-8.2159237],
+	                  ["Roscommon",53.6411924,-8.2074032],
+	                  ["Dublin- Kilbarrack ",53.4000887,-6.201726],
+	                  ["Wexford",52.31369,-6.4581779],
+	                  ["Dundalk",54.0044581,-6.3758899],
+	                  ["Sligo",54.1800758,-8.4902419],
+	                  ["Cavan",53.985764,-7.326713],
+	                  ["Ashbourne",53.5182915,-6.4131597],
+	                  ["Naas",53.2147728,-6.7086131],
+	                  ["Dublin - Santry",53.4071991,-6.2413401]]; 
+    var reader; //GLOBAL File Reader object for demo purpose only
+
+    /**
+     * Check for the various File API support.
+     */
+    function checkFileAPI() {
+        if (window.File && window.FileReader && window.FileList && window.Blob) {
+            reader = new FileReader();
+            return true; 
+        } else {
+            alert('The File APIs are not fully supported by your browser. Fallback required.');
+            return false;
+        }
+    }
+
+    /**
+     * read text input
+     */
+    function readText(filePath) {
+        var output = ""; //placeholder for text output
+        if(filePath.files && filePath.files[0]) {           
+            reader.onload = function (e) {
+                output = e.target.result;
+                displayContents(output);
+            };//end onload()
+            reader.readAsText(filePath.files[0]);
+        }//end if html5 filelist support
+        else if(ActiveXObject && filePath) { //fallback to IE 6-8 support via ActiveX
+            try {
+                reader = new ActiveXObject("Scripting.FileSystemObject");
+                var file = reader.OpenTextFile(filePath, 1); //ActiveX File Object
+                output = file.ReadAll(); //text contents of file
+                file.Close(); //close file "input stream"
+                displayContents(output);
+            } catch (e) {
+                if (e.number == -2146827859) {
+                    alert('Unable to access local files due to browser security settings. ' + 
+                     'To overcome this, go to Tools->Internet Options->Security->Custom Level. ' + 
+                     'Find the setting for "Initialize and script ActiveX controls not marked as safe" and change it to "Enable" or "Prompt"'); 
+                }
+            }       
+        }
+        else { 
+            return false;
+        }       
+        return true;
+    }   
+
+    /**
+     * display content using a basic HTML replacement
+     */
+    function displayContents(txt) {
+        var el = document.getElementById('main'); 
+        var rowno=0;
+        var htmldata="<table class='comicGreen'><tr><td colspan='15' align='right' style='padding-bottom:5px;'><input type='button' name='Get all distances' value='Get All distances'  onclick='initializeArr(this)'/></td></tr>";
+        var txtall=txt.replace(/(?:\r\n|\r|\n)/g, '<br/>');
+        var ss=1;
+        var singleline=txtall.split('<br/>');
+        for (i = 1; i < singleline.length; i++) {
+        	var columntxt= singleline[i].split(",");
+        	rowno=rowno+1;
+        	var coldata="";
+        	for (j = 0; j < columntxt.length; j++) {
+        		coldata=coldata+"<td>"+columntxt[j]+"</td>";
+        		
+        	}
+        	coldata="<tr>"+coldata;
+        	for (k = 0; k < branchesarr.length; k++) {
+        		displayedarr.push(columntxt[3]+","+columntxt[4]+","+branchesarr[k][1]+","+branchesarr[k][2]);
+    			htmldata=htmldata+coldata+"<td style='background: #F08F40'>&nbsp;</td><td>"+branchesarr[k][0]+"</td><td>"+branchesarr[k][1]+"</td><td>"+branchesarr[k][2]+"</td><td style='background: #F08F40'>&nbsp;</td><td ><input type='button' class='buttonclass' name='Get distance' value='Get distance' id='"+ss+columntxt[3].replace(".","P")+columntxt[4].replace(".","P")+(branchesarr[k][1]+"").replace(".","P")+(branchesarr[k][2]+"").replace(".","P")+"td'  onclick='initialize("+columntxt[3]+","+columntxt[4]+","+branchesarr[k][1]+","+branchesarr[k][2]+",this)'/></td></tr>";
+    			ss=ss+1;
+        	}
+        	//console.log(htmldata);
+        }
+        htmldata=htmldata+"</table>";
+        document.getElementById('totalrecord').innerHTML="(total number of records displayed "+rowno+"*"+branchesarr.length+"="+(rowno*branchesarr.length)+")";
+        el.innerHTML = htmldata; //display output in DOM
+        
+    }   
+  
+   
+     function initializeArr(that){
+	   for (j = 0; j < displayedarr.length; j++) {
+		   var lat1,lng1,lat2,lng2;
+		   var arritems=displayedarr[j].split(",");
+		   lat1=arritems[0];
+		   lng1=arritems[1];
+		   lat2=arritems[2];
+		   lng2=arritems[3];
+		   var btnid=(j+1)+(lat1.replace(".","P")+lng1.replace(".","P")+lat2.replace(".","P")+lng2.replace(".","P"))+"td";
+		   var $btnobj=$("#"+btnid);
+		   initialize(parseFloat(lat1),parseFloat(lng1),parseFloat(lat2),parseFloat(lng2),$btnobj);
+	   }
+   }
+   
+     function initialize(lat1,lng1,lat2,lng2,that){
+	   var origin = new google.maps.LatLng( lat1, lng1 ); // using google.maps.LatLng class
+	   var destination = lat2 + ', ' + lng2; // using string
+		//sleep(1000);
+	   var directionsService = new google.maps.DirectionsService();
+	   var request = {
+	       origin: origin, // LatLng|string
+	       destination: destination, // LatLng|string
+	       travelMode: google.maps.DirectionsTravelMode.DRIVING
+	   };
+
+	   directionsService.route( request, function( response, status ) {
+		   console.log(response,status);
+		//point.duration.text
+	       if ( status === 'OK' ) {
+	           var point = response.routes[ 0 ].legs[ 0 ];
+	           console.log(point);
+	           $(that).parent().html( point.distance.text);
+	       }
+	       else{
+	       $(that).parent().html( "-");
+	       }
+	   } ); 
+	}
+    function sleep(delay) {
+        var start = new Date().getTime();
+        while (new Date().getTime() < start + delay);
+      }
+</script>
+<style type="text/css">
+table.comicGreen {
+  font-family: Arial, Helvetica, sans-serif;
+  border: 1px solid #4F7849;
+  background-color: #EEEEEE;
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+table.comicGreen td, table.comicGreen th {
+  border: 1px solid #4F7849;
+  padding: 1px 1px;
+}
+table.comicGreen tbody td {
+  font-size: 12px;
+  color: #4F7849;
+}
+table.comicGreen tr:nth-child(even) {
+  background: #CEE0CC;
+}
+table.comicGreen tfoot {
+  font-size: 13px;
+  color: #FFFFFF;
+  background: #4F7849;
+  background: -moz-linear-gradient(top, #7b9a76 0%, #60855b 66%, #4F7849 100%);
+  background: -webkit-linear-gradient(top, #7b9a76 0%, #60855b 66%, #4F7849 100%);
+  background: linear-gradient(to bottom, #7b9a76 0%, #60855b 66%, #4F7849 100%);
+  border-top: 1px solid #444444;
+}
+table.comicGreen tfoot td {
+  font-size: 12px;
+}
+</style>
+</head>
+<body onload="checkFileAPI();">
+    <div id="container">    
+        Upload Customers csv file here(remove comma from addresses): <input type="file" onchange='readText(this)' />
+        <br/>
+        <hr/>   
+        <h3>Contents of the customer file with branches location<span id="totalrecord"></span>:</h3>
+        <div id="main">
+            
+        </div>
+    </div>
+</body>
+</html>
